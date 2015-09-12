@@ -51,14 +51,19 @@ func start(ctx *cli.Context) {
 }
 
 func enableGlitches(ctx *cli.Context, handler *BaDNSHandler) {
+	g := glitch.Ttl{TTL: ctx.Int("ttl")}
+	handler.AddGlitch(g)
+
 	if ctx.Int("delay") > 0 {
 		g := glitch.Delay{Duration: 3 * time.Second}
 		handler.AddGlitch(g)
 	}
+
 	if ctx.Bool("no-answer") {
 		g := glitch.NoAnswer{}
 		handler.AddGlitch(g)
 	}
+
 	if ctx.String("replace-type") != "" {
 		g := glitch.ReplaceType{Type: ctx.String("replace-type")}
 		handler.AddGlitch(g)
@@ -74,7 +79,7 @@ func main() {
 		cli.IntFlag{
 			Name:  "port, p",
 			Value: 53,
-			Usage: "Listen port",
+			Usage: "Listen port(default=53)",
 		},
 		cli.BoolFlag{
 			Name:  "tcp",
@@ -83,7 +88,12 @@ func main() {
 		cli.StringFlag{
 			Name:  "log_level, l",
 			Value: "info",
-			Usage: "Logging level (debug, info, warn, error, fatal, panic)",
+			Usage: "Logging level (debug, info, warn, error, fatal, panic) (default=info)",
+		},
+		cli.IntFlag{
+			Name:  "ttl",
+			Value: 1,
+			Usage: "Force TTL to the given value for all responses (default=1)",
 		},
 		cli.StringFlag{
 			Name:  "host-prefix",
@@ -93,7 +103,7 @@ func main() {
 		cli.IntFlag{
 			Name:  "delay",
 			Value: 0,
-			Usage: "Delay DNS responses (in seconds)",
+			Usage: "Delay DNS responses (default=0 seconds)",
 		},
 		cli.BoolFlag{
 			Name:  "no-answer",

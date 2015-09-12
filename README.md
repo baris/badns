@@ -1,0 +1,2 @@
+# badns
+Bad DNS

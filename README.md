@@ -1,4 +1,4 @@
-# BaDNS
+# badNS
 
 Mess up with DNS responses.
 

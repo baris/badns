@@ -55,18 +55,27 @@ func enableGlitches(ctx *cli.Context, handler *BaDNSHandler) {
 	handler.AddGlitch(g)
 
 	if ctx.Int("delay") > 0 {
-		g := glitch.Delay{Duration: 3 * time.Second}
-		handler.AddGlitch(g)
+		handler.AddGlitch(
+			glitch.Delay{Duration: 3 * time.Second},
+		)
 	}
 
 	if ctx.Bool("no-answer") {
-		g := glitch.NoAnswer{}
-		handler.AddGlitch(g)
+		handler.AddGlitch(
+			glitch.LimitAnswers{Limit: 0},
+		)
+	}
+
+	if ctx.Int("limit-answers") > -1 {
+		handler.AddGlitch(
+			glitch.LimitAnswers{Limit: ctx.Int("limit-answers")},
+		)
 	}
 
 	if ctx.String("replace-type") != "" {
-		g := glitch.ReplaceType{Type: ctx.String("replace-type")}
-		handler.AddGlitch(g)
+		handler.AddGlitch(
+			glitch.ReplaceType{Type: ctx.String("replace-type")},
+		)
 	}
 }
 
@@ -113,6 +122,11 @@ func main() {
 			Name:  "replace-type",
 			Value: "",
 			Usage: "Replace RR types with set value (i.e. MX) or define a mapping (i.e. A:AAAA)",
+		},
+		cli.IntFlag{
+			Name:  "limit-answers",
+			Value: -1,
+			Usage: "Limit the number of answers in the responses (default=-1, unlimited)",
 		},
 	}
 	app.Action = start
